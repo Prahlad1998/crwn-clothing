@@ -4,13 +4,14 @@ import {
     getAuth,
     signInWithRedirect,
     GoogleAuthProvider,
-    signInWithPopup
+    signInWithPopup,
+    createUserWithEmailAndPassword //method helps in case of email and password signup
     } from 'firebase/auth';
 import {
     getFirestore,
     doc,//retrive documents inside our firestore database
-    getDoc, //play with the data inside the document
-    setDoc //play with the data inside the document
+    getDoc, //when data is exist ,play with the data inside the document
+    setDoc //when data is not exist ,insert them into the database.
     } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -37,12 +38,12 @@ const firebaseApp = initializeApp(firebaseConfig);
  export const signInWithGooglePopup=()=>signInWithPopup(auth,provider);
 
 export const db=getFirestore(); // this db will directly points to our database in the console 
-export const createUserDocumentFromAuth = async( userAuth) =>
+export const createUserDocumentFromAuth = async( userAuth,additionalInformation={}) =>
 {
-    const userDocRef= doc(db,'users','userAuth.uid'); 
+    const userDocRef= doc(db,'users',userAuth.uid); 
     const userSnapshot= await getDoc(userDocRef);
     console.log(userSnapshot);
-    console.log(userSnapshot.exists( ));
+    console.log(userSnapshot.exists());
     //if the user snapshot does not exist then first we have to add the user information into our dataset.
     if (!userSnapshot.exists()){
         const {displayName, email}=userAuth;
@@ -52,6 +53,7 @@ export const createUserDocumentFromAuth = async( userAuth) =>
                 displayName,
                 email,
                 createdat,
+                ...additionalInformation,
             });
         }catch(error){
             console.log('Error,Creating the User',error.message);
@@ -59,5 +61,11 @@ export const createUserDocumentFromAuth = async( userAuth) =>
     }
     //if the user data is exist then
     return userDocRef;
-}
+};
+
+//for email and password sign Up process.
+export const createAuthUserWithEmailAndPassword = async(email,password)=>{
+     if(!email|| !password) return;
+    return await createUserWithEmailAndPassword(auth,email,password);
+};
 
