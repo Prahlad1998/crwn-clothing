@@ -1,49 +1,52 @@
-import './sign-up-form.styles.scss';
-import Button  from '../button/button.component';
+import "./sign-in-form.styles.scss";
+import Button from "../button/button.component";
 import FormInput from "../form-input/form-input.component";
 import {
+  signInWithGooglePopup,
   createAuthUserWithEmailAndPassword,
   createUserDocumentFromAuth,
+  signInAuthUserWithEmailAndPassword,
 } from "../../utills/firebase/firebase.utills";
 import { useState } from "react";
 const defaultFormFields = {
-  displayName: "",
   email: "",
   password: "",
-  confirmPassword: "",
 };
 
-
-const SignUpForm = () => {
+const SignInForm = () => {
   const [formFields, setformFields] = useState(defaultFormFields);
-  const { displayName, email, password, confirmPassword } = formFields;
+  const { email, password } = formFields;
 
   console.log(formFields);
   const restFormFields = () => {
     setformFields(defaultFormFields);
   };
+  const signInWithGoogle = async () => {
+    const { user } = await signInWithGooglePopup();
+    await createUserDocumentFromAuth(user);
+    //  console.log(response);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    //check the password match or not
-    if (password != confirmPassword) {
-      alert("password do not matching");
-      return;
-    }
-    //afte matching the password and createpassword we need to create the user
+
     try {
-      const { user } = await createAuthUserWithEmailAndPassword(
+      const response = await signInAuthUserWithEmailAndPassword(
         email,
         password
       );
-
-      await createUserDocumentFromAuth(user, {displayName});
+      console.log(response);
       restFormFields();
     } catch (error) {
-      if (error.code == "auth/email-already-in-use") {
-        alert("Can not proceed as the email is in used");
-      } else {
-        console.log("User creation encountered an error ", error);
+      switch (error.code) {
+        case "auth/user-not-found":
+          alert("No user found associated with this Email");
+          break;
+        case "auth/wrong-password":
+          alert("Incorrect Password for email");
+          break;
+        default:
+          console.log(error);
       }
     }
   };
@@ -55,18 +58,9 @@ const SignUpForm = () => {
   //Here handlechange is a function which is running after every input in the input box and value is stored in the formFields. UseState is hooks where defaultformfields is an object set to empty value.
   return (
     <div className="sign-up-container">
-        <h2>Don't have an Account?</h2>
-      <span>Sign Up with Email and Password</span>
-      <form action="" onSubmit={handleSubmit}>
-        <FormInput
-          label="Display Name"
-          type="text"
-          required
-          onChange={handleChange}
-          name="displayName"
-          value={displayName}
-        />
-
+      <h2>Already have an Account?</h2>
+      <span>Sign In with Email and Password</span>
+      <form onSubmit={handleSubmit}>
         <FormInput
           label="Email"
           type="email"
@@ -83,19 +77,15 @@ const SignUpForm = () => {
           name="password"
           value={password}
         />
-        <FormInput
-          label="Confirm Password"
-          type="password"
-          required
-          onChange={handleChange}
-          name="confirmPassword"
-          value={confirmPassword}
-        />
-
-        <Button  type="submit">Sign Up</Button>
+        <div className="buttons-container">
+          <Button type="submit">Sign In</Button>
+          <Button type='button' buttontype="google" onClick={signInWithGoogle}>
+            Google Sign In
+          </Button>
+        </div>
       </form>
     </div>
   );
 };
 
-export default SignUpForm;
+export default SignInForm;
