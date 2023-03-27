@@ -3,7 +3,6 @@ import PRODUCTS from '../shop-data.json';
  
 export const ProductsContext=createContext({
     products:[],//want to store an array of products
-
 });
 
 export const ProductsProvider=({children})=>{
