@@ -1,8 +1,8 @@
-import { useState} from "react";
+import { useState } from "react";
 import "./sign-in-form.styles.scss";
-import Button from "../button/button.component";
+import Button, { BUTTON_TYPE_CLASSES } from "../button/button.component";
 import FormInput from "../form-input/form-input.component";
-import {UserContext} from '../../context/user.context';
+import { UserContext } from "../../context/user.context";
 import {
   signInWithGooglePopup,
   createAuthUserWithEmailAndPassword,
@@ -26,7 +26,7 @@ const SignInForm = () => {
   };
   const signInWithGoogle = async () => {
     await signInWithGooglePopup();
-    
+
     //  console.log(response);
   };
 
@@ -34,7 +34,7 @@ const SignInForm = () => {
     event.preventDefault();
 
     try {
-      const {user} = await signInAuthUserWithEmailAndPassword(
+      const { user } = await signInAuthUserWithEmailAndPassword(
         email,
         password
       );
@@ -82,7 +82,11 @@ const SignInForm = () => {
         />
         <div className="buttons-container">
           <Button type="submit">Sign In</Button>
-          <Button type='button' buttontype="google" onClick={signInWithGoogle}>
+          <Button
+            type="button"
+            buttontype={BUTTON_TYPE_CLASSES.google}
+            onClick={signInWithGoogle}
+          >
             Google Sign In
           </Button>
         </div>
