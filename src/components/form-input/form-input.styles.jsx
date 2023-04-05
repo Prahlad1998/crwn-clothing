@@ -1,7 +1,7 @@
 import styled,{css} from "styled-components";
 
 //css block is used in case of rendering particular css tool and execute conditionally
-
+ 
 const subColor='grey';
 const mainColor='black';
  
